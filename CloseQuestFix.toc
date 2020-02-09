@@ -1,0 +1,10 @@
+## Interface: 80300
+## Title: CloseQuestFix
+## Author: LudiusMaximus
+## Notes: Making sure that the quest frame closes after accepting the last quest of an NPC.
+## RequiredDeps:
+## OptionalDeps:
+## Version: 1.3
+
+embeds.xml
+main.lua
