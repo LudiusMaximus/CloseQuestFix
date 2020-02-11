@@ -7,6 +7,7 @@ eventFrame:RegisterEvent("QUEST_GREETING")
 eventFrame:RegisterEvent("GOSSIP_CLOSED")
 eventFrame:RegisterEvent("QUEST_DETAIL")
 eventFrame:RegisterEvent("QUEST_ACCEPTED")
+eventFrame:RegisterEvent("QUEST_TURNED_IN")
 
 
 local gossipShown = false
@@ -29,7 +30,7 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
   elseif event == "QUEST_DETAIL" then
     questDetailsOpened = questDetailsOpened + 1
     
-  elseif event == "QUEST_ACCEPTED" and not QuestGetAutoAccept() then
+  elseif event == "QUEST_TURNED_IN" or (event == "QUEST_ACCEPTED" and not QuestGetAutoAccept()) then
     questDetailsOpened = questDetailsOpened - 1
     L:ScheduleTimer("closeIfDone", 0.3)
     
