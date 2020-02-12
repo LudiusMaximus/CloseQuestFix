@@ -2,8 +2,10 @@ local folderName = ...
 local L = LibStub("AceAddon-3.0"):NewAddon(folderName, "AceTimer-3.0")
 
 local eventFrame = CreateFrame("Frame")
+
 eventFrame:RegisterEvent("GOSSIP_SHOW")
 eventFrame:RegisterEvent("QUEST_GREETING")
+eventFrame:RegisterEvent("QUESTLINE_UPDATE")
 eventFrame:RegisterEvent("GOSSIP_CLOSED")
 eventFrame:RegisterEvent("QUEST_DETAIL")
 eventFrame:RegisterEvent("QUEST_ACCEPTED")
@@ -18,7 +20,7 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
 
   -- print(event, questDetailsOpened)
 
-  if event == "GOSSIP_SHOW" or event == "QUEST_GREETING" then
+  if event == "GOSSIP_SHOW" or event == "QUEST_GREETING" or event == "QUESTLINE_UPDATE" then
     questDetailsOpened = 0
     gossipShown = true
     L:CancelAllTimers()
@@ -32,11 +34,14 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
     
   elseif event == "QUEST_TURNED_IN" or (event == "QUEST_ACCEPTED" and not QuestGetAutoAccept()) then
     questDetailsOpened = questDetailsOpened - 1
+    -- Must not be negative!
+    if questDetailsOpened < 0 then
+      questDetailsOpened = 0
+    end
     L:ScheduleTimer("closeIfDone", 0.3)
-    
   end
 
-  -- print(questDetailsOpened)
+  -- print("questDetailsOpened", questDetailsOpened)
 
 end)
 
