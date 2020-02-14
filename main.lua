@@ -36,12 +36,12 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
       questDetailsOpened = 0
       gossipShown = false
     end
-    
-    
-    
+
+
+
   elseif event == "GOSSIP_CLOSED" then
     gossipShown = false
-    
+
 
   -- The order in which QUEST_ACCEPTED and QUEST_DETAIL of the next quest happen is indeterministic.
   -- Hence we have to use this counter such that CloseIfDone() finds 1 or 0 depending
@@ -49,7 +49,8 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
   elseif event == "QUEST_DETAIL" then
     questDetailsOpened = questDetailsOpened + 1
     -- Must not set gossipShown = true here, otherwise it will not close after QUEST_ACCEPTED.
-    
+    L:ScheduleTimer("ResetQuestDetailsOpened", 1.0)
+
   elseif event == "QUEST_ACCEPTED" and not QuestGetAutoAccept() then
     questDetailsOpened = questDetailsOpened - 1
     -- Must not be negative, otherwise a later QUEST_DETAIL may not increase over 0.
@@ -57,12 +58,12 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
       questDetailsOpened = 0
     end
     L:ScheduleTimer("CloseIfDone", 0.3)
-  
-  
+
+
   -- Some quests (e.g. "Wolves at Our Heels") also do not close after handing them in!
   elseif event == "QUEST_TURNED_IN" then
     L:ScheduleTimer("CloseIfDone", 0.3)
-  
+
   end
 
   -- print("questDetailsOpened", questDetailsOpened, gossipShown)
@@ -72,11 +73,21 @@ end)
 
 
 function L:CloseIfDone()
-
   if questDetailsOpened < 1 and not gossipShown then
     -- print("Closing Quest")
     CloseQuest()
   end
-  
 end
 
+
+-- For some quest givers it is possible to click on the NPC repeatedly and get a
+-- QUEST_DETAIL event every time without another event in between. To prevent the
+-- questDetailsOpened counter from growing infinitely we reset it after 1 second.
+-- We cannot reset it immediately because the actual purpose of this counter is
+-- to register the indeterministic opening and closing of two successive quests.
+function L:ResetQuestDetailsOpened()
+  if questDetailsOpened > 1 then
+    -- print("Reseting")
+    questDetailsOpened = 1
+  end
+end
