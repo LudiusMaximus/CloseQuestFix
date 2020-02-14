@@ -24,9 +24,10 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
   -- Some NPC interaction is initialised with just QUESTLINE_UPDATE,
   -- but we leave this out here for now!
   if event == "GOSSIP_SHOW" or event == "QUEST_GREETING" then
+    L:CancelAllTimers()
     questDetailsOpened = 0
     gossipShown = true
-    L:CancelAllTimers()
+    
 
 
   -- To reset the questDetailsOpened counter,
@@ -47,6 +48,7 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
   -- Hence we have to use this counter such that CloseIfDone() finds 1 or 0 depending
   -- on whether another QUEST_DETAIL has been opened.
   elseif event == "QUEST_DETAIL" then
+    L:CancelAllTimers()
     questDetailsOpened = questDetailsOpened + 1
     -- Must not set gossipShown = true here, otherwise it will not close after QUEST_ACCEPTED.
     L:ScheduleTimer("ResetQuestDetailsOpened", 1.0)
@@ -57,13 +59,14 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
     if questDetailsOpened < 0 then
       questDetailsOpened = 0
     end
+    -- print("QUEST_ACCEPTED", GetTime())
     L:ScheduleTimer("CloseIfDone", 0.3)
 
 
   -- Some quests (e.g. "Wolves at Our Heels") also do not close after handing them in!
   elseif event == "QUEST_TURNED_IN" then
-    L:ScheduleTimer("CloseIfDone", 0.3)
-
+    -- print("QUEST_TURNED_IN", GetTime())
+    L:ScheduleTimer("CloseIfDone", 1.0)
   end
 
   -- print("questDetailsOpened", questDetailsOpened, gossipShown)
@@ -74,7 +77,7 @@ end)
 
 function L:CloseIfDone()
   if questDetailsOpened < 1 and not gossipShown then
-    -- print("Closing Quest")
+    -- print("Closing Quest", GetTime())
     CloseQuest()
   end
 end
