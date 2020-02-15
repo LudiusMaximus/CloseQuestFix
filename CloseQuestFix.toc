@@ -4,7 +4,7 @@
 ## Notes: Making sure that the quest frame closes after accepting the last quest of an NPC.
 ## RequiredDeps:
 ## OptionalDeps:
-## Version: 1.5
+## Version: 1.6
 
 embeds.xml
 main.lua

@@ -10,6 +10,7 @@ eventFrame:RegisterEvent("GOSSIP_CLOSED")
 eventFrame:RegisterEvent("QUEST_DETAIL")
 eventFrame:RegisterEvent("QUEST_ACCEPTED")
 eventFrame:RegisterEvent("QUEST_TURNED_IN")
+eventFrame:RegisterEvent("QUEST_PROGRESS")
 
 
 local gossipShown = false
@@ -42,6 +43,11 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
 
   elseif event == "GOSSIP_CLOSED" then
     gossipShown = false
+
+
+  elseif event == "QUEST_PROGRESS" then
+    L:CancelAllTimers()
+  
 
 
   -- The order in which QUEST_ACCEPTED and QUEST_DETAIL of the next quest happen is indeterministic.
