@@ -9,14 +9,14 @@ eventFrame:RegisterEvent("QUEST_PROGRESS")
 eventFrame:RegisterEvent("QUEST_COMPLETE")
 
 eventFrame:RegisterEvent("QUEST_FINISHED")
-eventFrame:RegisterEvent("GOSSIP_CLOSED")
+
+
 eventFrame:RegisterEvent("QUEST_DETAIL")
 eventFrame:RegisterEvent("QUEST_ACCEPTED")
 eventFrame:RegisterEvent("QUEST_TURNED_IN")
 
 
 
-local gossipShown = false
 local questDetailsOpened = 0
 
 
@@ -27,34 +27,24 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
   -- Initialise NPC interaction.
   -- Some NPC interaction is initialised with just QUESTLINE_UPDATE,
   -- but we leave this out here for now!
-  if event == "GOSSIP_SHOW" or event == "QUEST_GREETING" or event == "QUEST_PROGRESS" or event == "QUEST_COMPLETE"then
+  if event == "GOSSIP_SHOW" or event == "QUEST_GREETING" or event == "QUEST_PROGRESS" or event == "QUEST_COMPLETE" then
     L:CancelAllTimers()
-    questDetailsOpened = 0
-    gossipShown = true
-    
+    questDetailsOpened = 0    
 
 
   -- To reset the questDetailsOpened counter,
-  -- if a quest is started with QUEST_DETAIL is declined.
+  -- if a quest started with QUEST_DETAIL is declined.
   elseif event == "QUEST_FINISHED" then
     if not QuestFrame:IsShown() then
       questDetailsOpened = 0
-      gossipShown = false
     end
-
-
-
-  elseif event == "GOSSIP_CLOSED" then
-    gossipShown = false
 
 
   -- The order in which QUEST_ACCEPTED and QUEST_DETAIL of the next quest happen is indeterministic.
   -- Hence we have to use this counter such that CloseIfDone() finds 1 or 0 depending
   -- on whether another QUEST_DETAIL has been opened.
   elseif event == "QUEST_DETAIL" then
-    L:CancelAllTimers()
     questDetailsOpened = questDetailsOpened + 1
-    -- Must not set gossipShown = true here, otherwise it will not close after QUEST_ACCEPTED.
     L:ScheduleTimer("ResetQuestDetailsOpened", 1.0)
 
   elseif event == "QUEST_ACCEPTED" and not QuestGetAutoAccept() then
@@ -73,14 +63,14 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
     L:ScheduleTimer("CloseIfDone", 0.75)
   end
 
-  -- print("questDetailsOpened", questDetailsOpened, gossipShown)
+  -- print("questDetailsOpened", questDetailsOpened)
 
 end)
 
 
 
 function L:CloseIfDone()
-  if questDetailsOpened < 1 and not gossipShown then
+  if questDetailsOpened < 1 then
     -- print("Closing Quest", GetTime())
     CloseQuest()
   end
