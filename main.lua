@@ -5,12 +5,15 @@ local eventFrame = CreateFrame("Frame")
 
 eventFrame:RegisterEvent("GOSSIP_SHOW")
 eventFrame:RegisterEvent("QUEST_GREETING")
+eventFrame:RegisterEvent("QUEST_PROGRESS")
+eventFrame:RegisterEvent("QUEST_COMPLETE")
+
 eventFrame:RegisterEvent("QUEST_FINISHED")
 eventFrame:RegisterEvent("GOSSIP_CLOSED")
 eventFrame:RegisterEvent("QUEST_DETAIL")
 eventFrame:RegisterEvent("QUEST_ACCEPTED")
 eventFrame:RegisterEvent("QUEST_TURNED_IN")
-eventFrame:RegisterEvent("QUEST_PROGRESS")
+
 
 
 local gossipShown = false
@@ -24,7 +27,7 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
   -- Initialise NPC interaction.
   -- Some NPC interaction is initialised with just QUESTLINE_UPDATE,
   -- but we leave this out here for now!
-  if event == "GOSSIP_SHOW" or event == "QUEST_GREETING" then
+  if event == "GOSSIP_SHOW" or event == "QUEST_GREETING" or event == "QUEST_PROGRESS" or event == "QUEST_COMPLETE"then
     L:CancelAllTimers()
     questDetailsOpened = 0
     gossipShown = true
@@ -45,11 +48,6 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
     gossipShown = false
 
 
-  elseif event == "QUEST_PROGRESS" then
-    L:CancelAllTimers()
-  
-
-
   -- The order in which QUEST_ACCEPTED and QUEST_DETAIL of the next quest happen is indeterministic.
   -- Hence we have to use this counter such that CloseIfDone() finds 1 or 0 depending
   -- on whether another QUEST_DETAIL has been opened.
@@ -66,13 +64,13 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
       questDetailsOpened = 0
     end
     -- print("QUEST_ACCEPTED", GetTime())
-    L:ScheduleTimer("CloseIfDone", 0.3)
+    L:ScheduleTimer("CloseIfDone", 0.75)
 
 
   -- Some quests (e.g. "Wolves at Our Heels") also do not close after handing them in!
   elseif event == "QUEST_TURNED_IN" then
     -- print("QUEST_TURNED_IN", GetTime())
-    L:ScheduleTimer("CloseIfDone", 1.0)
+    L:ScheduleTimer("CloseIfDone", 0.75)
   end
 
   -- print("questDetailsOpened", questDetailsOpened, gossipShown)
