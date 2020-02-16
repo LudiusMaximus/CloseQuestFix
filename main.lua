@@ -29,13 +29,13 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
   -- but we leave this out here for now!
   if event == "GOSSIP_SHOW" or event == "QUEST_GREETING" or event == "QUEST_PROGRESS" or event == "QUEST_COMPLETE" then
     L:CancelAllTimers()
-    questDetailsOpened = 0    
+    questDetailsOpened = 0
 
 
   -- To reset the questDetailsOpened counter,
   -- if a quest started with QUEST_DETAIL is declined.
   elseif event == "QUEST_FINISHED" then
-    if not QuestFrame:IsShown() then
+    if QuestFrame and not QuestFrame:IsShown() then
       questDetailsOpened = 0
     end
 
@@ -70,8 +70,8 @@ end)
 
 
 function L:CloseIfDone()
-  if questDetailsOpened < 1 then
-    -- print("Closing Quest", GetTime())
+  if questDetailsOpened < 1 and QuestFrame and QuestFrame:IsShown() then
+    -- print("Closing Quest !!!!!!!!!!!!!!!!!!!!", GetTime())
     CloseQuest()
   end
 end
