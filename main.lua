@@ -54,13 +54,13 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
       questDetailsOpened = 0
     end
     -- print("QUEST_ACCEPTED", GetTime())
-    L:ScheduleTimer("CloseIfDone", 0.75)
+    L:ScheduleTimer("CloseIfDone", 0.5)
 
 
   -- Some quests (e.g. "Wolves at Our Heels") also do not close after handing them in!
   elseif event == "QUEST_TURNED_IN" then
     -- print("QUEST_TURNED_IN", GetTime())
-    L:ScheduleTimer("CloseIfDone", 0.75)
+    L:ScheduleTimer("CloseIfDone", 0.5)
   end
 
   -- print("questDetailsOpened", questDetailsOpened)
@@ -70,7 +70,7 @@ end)
 
 
 function L:CloseIfDone()
-  if questDetailsOpened < 1 and QuestFrame and QuestFrame:IsShown() then
+  if questDetailsOpened < 1 and ((QuestFrame and QuestFrame:IsShown()) or (ImmersionFrame and ImmersionFrame:IsShown())   ) then
     -- print("Closing Quest !!!!!!!!!!!!!!!!!!!!", GetTime())
     CloseQuest()
   end
