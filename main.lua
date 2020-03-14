@@ -18,25 +18,28 @@ eventFrame:RegisterEvent("QUEST_TURNED_IN")
 
 
 local questDetailsOpened = 0
+local greetingsShown = false
 
 
 eventFrame:SetScript("OnEvent", function(self, event, ...)
 
-  -- print(event, questDetailsOpened)
+  -- print(event, ": questDetailsOpened:", questDetailsOpened)
 
   -- Initialise NPC interaction.
   -- Some NPC interaction is initialised with just QUESTLINE_UPDATE,
   -- but we leave this out here for now!
-  if event == "GOSSIP_SHOW" or event == "QUEST_GREETING" or event == "QUEST_PROGRESS" or event == "QUEST_COMPLETE" then
+  if event == "GOSSIP_SHOW" or event == "QUEST_GREETING" or event == "QUEST_PROGRESS" or event == "QUEST_COMPLETE"  then
     L:CancelAllTimers()
     questDetailsOpened = 0
-
+    greetingsShown = true
+  
 
   -- To reset the questDetailsOpened counter,
   -- if a quest started with QUEST_DETAIL is declined.
   elseif event == "QUEST_FINISHED" then
     if QuestFrame and not QuestFrame:IsShown() then
       questDetailsOpened = 0
+      greetingsShown = false
     end
 
 
@@ -45,6 +48,7 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
   -- on whether another QUEST_DETAIL has been opened.
   elseif event == "QUEST_DETAIL" then
     questDetailsOpened = questDetailsOpened + 1
+    greetingsShown = false
     L:ScheduleTimer("ResetQuestDetailsOpened", 1.0)
 
   elseif event == "QUEST_ACCEPTED" and not QuestGetAutoAccept() then
@@ -70,7 +74,7 @@ end)
 
 
 function L:CloseIfDone()
-  if questDetailsOpened < 1 and ((QuestFrame and QuestFrame:IsShown()) or (ImmersionFrame and ImmersionFrame:IsShown())   ) then
+  if not greetingsShown and questDetailsOpened < 1 and ((QuestFrame and QuestFrame:IsShown()) or (ImmersionFrame and ImmersionFrame:IsShown())   ) then
     -- print("Closing Quest !!!!!!!!!!!!!!!!!!!!", GetTime())
     CloseQuest()
   end
