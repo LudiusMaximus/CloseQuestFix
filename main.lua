@@ -1,6 +1,10 @@
 local folderName = ...
 local L = LibStub("AceAddon-3.0"):NewAddon(folderName, "AceTimer-3.0")
 
+local GetTime = _G.GetTime
+local QuestGetAutoAccept = _G.QuestGetAutoAccept
+
+
 local eventFrame = CreateFrame("Frame")
 
 eventFrame:RegisterEvent("GOSSIP_SHOW")
@@ -10,7 +14,6 @@ eventFrame:RegisterEvent("QUEST_COMPLETE")
 
 eventFrame:RegisterEvent("QUEST_FINISHED")
 
-
 eventFrame:RegisterEvent("QUEST_DETAIL")
 eventFrame:RegisterEvent("QUEST_ACCEPTED")
 eventFrame:RegisterEvent("QUEST_TURNED_IN")
@@ -19,6 +22,8 @@ eventFrame:RegisterEvent("QUEST_TURNED_IN")
 
 local questDetailsOpened = 0
 local greetingsShown = false
+
+local lastQuestDetail = GetTime()
 
 
 eventFrame:SetScript("OnEvent", function(self, event, ...)
@@ -32,7 +37,7 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
     L:CancelAllTimers()
     questDetailsOpened = 0
     greetingsShown = true
-  
+
 
   -- To reset the questDetailsOpened counter,
   -- if a quest started with QUEST_DETAIL is declined.
@@ -47,6 +52,7 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
   -- Hence we have to use this counter such that CloseIfDone() finds 1 or 0 depending
   -- on whether another QUEST_DETAIL has been opened.
   elseif event == "QUEST_DETAIL" then
+    lastQuestDetail = GetTime()
     questDetailsOpened = questDetailsOpened + 1
     greetingsShown = false
     L:ScheduleTimer("ResetQuestDetailsOpened", 1.0)
@@ -58,8 +64,9 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
       questDetailsOpened = 0
     end
     -- print("QUEST_ACCEPTED", GetTime())
-    L:ScheduleTimer("CloseIfDone", 0.5)
-
+    if GetTime() - lastQuestDetail > 0.2 then
+      L:ScheduleTimer("CloseIfDone", 0.5)
+    end
 
   -- Some quests (e.g. "Wolves at Our Heels") also do not close after handing them in!
   elseif event == "QUEST_TURNED_IN" then
@@ -74,7 +81,7 @@ end)
 
 
 function L:CloseIfDone()
-  if not greetingsShown and questDetailsOpened < 1 and ((QuestFrame and QuestFrame:IsShown()) or (ImmersionFrame and ImmersionFrame:IsShown())   ) then
+  if not greetingsShown and questDetailsOpened < 1 and ( (QuestFrame and QuestFrame:IsShown()) or (ImmersionFrame and ImmersionFrame:IsShown()) ) then
     -- print("Closing Quest !!!!!!!!!!!!!!!!!!!!", GetTime())
     CloseQuest()
   end
